@@ -1,9 +1,7 @@
 name: CI
 
 on:
-  - push
-  - pull_request
-
+  workflow_dispatch:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -37,6 +35,8 @@ jobs:
           - node: 14
             os: macOS-latest
     steps:
+      - name: Configure npm time machine registry
+        run: npm config set registry https://:2022-05-01T19%3A09%3A35.949000Z@time-machines-npm.sealsecurity.io/
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -49,13 +49,9 @@ jobs:
       # author. Linting is not part of the test suite (`npm test` is separate).
       - run: npm test
       - run: npm pack
-        if:
-          matrix.os == 'ubuntu-latest' && matrix.node == 18 && matrix.arch ==
-          'x64'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 18 && matrix.arch == 'x64'
       - uses: actions/upload-artifact@v4
-        if:
-          matrix.os == 'ubuntu-latest' && matrix.node == 18 && matrix.arch ==
-          'x64'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 18 && matrix.arch == 'x64'
         with:
           name: npm-tarball
           path: '*.tgz'
